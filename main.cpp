@@ -25,6 +25,8 @@ const int ROUND_NUM = 10;
 const int GA_ROUND = 1000;
 // 变异概率
 const double P_MUTATE = 0.1;
+// 每次杂交交换的染色体数量
+const int SWAP_CNT = 10;
 
 const int INF = 2147483647;
 unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -46,12 +48,12 @@ struct Population_individual {
     std::array<one, N> v;
     // 缓存
     double fit; bool cala_ok;
-
     Population_individual() { cala_ok = false; }
+
     // 得到对应的染色体, return (序列, 二进制位, 是否是符号位)
     std::tuple<int, int, bool> get_idx_id_syb(int x) {
-        int idx = x / (binN + 1);
-        int id  = x % (binN + 1);
+        int idx  = x / (binN + 1);
+        int id   = x % (binN + 1);
         bool syb = false;
         if(id == binN) syb = true, id = -1;
         return {idx, id, syb};
@@ -74,8 +76,10 @@ struct Population_individual {
             std::swap(a.v[idx].symbol, b.v[idx].symbol);
         } else {
             int buf1 = (a.v[idx].value & (1 << id)), buf2 = (b.v[idx].value & (1 << id));
-            a.v[idx].value += buf2 - buf1, b.v[idx].value += buf1 - buf2;
-            a.v[idx].value %= (MAXN + 1) , b.v[idx].value %= (MAXN + 1); // 保证在值域内
+            // 保证在值域内
+            if(a.v[idx].value + buf2 - buf1 <= MAXN && b.v[idx].value + buf1 - buf2 <= MAXN) {
+                a.v[idx].value += buf2 - buf1, b.v[idx].value += buf1 - buf2;
+            }
         }
     }
     // 多点交叉
@@ -133,7 +137,7 @@ struct GA {
             Populations.back().cala_ok = false;
             int m = Populations.size() - 1;
             std::unordered_set<int> arrx;
-            while(arrx.size() < 20) {
+            while(arrx.size() < SWAP_CNT) {
                 arrx.insert(get_rand(N * (binN + 1)));
             }
             hybrid(Populations[m], Populations[m - 1], arrx);
@@ -179,10 +183,9 @@ struct GA {
 };
 
 int main () {
-    int limit = LIMIT;
-    double p = P_MUTATE;
     std::cout << std::fixed << std::setprecision(6);
-    GA ga(limit, p);
+    freopen("out.out", "w", stdout);
+    GA ga(LIMIT, P_MUTATE);
     for(int _ = 0; _ <= GA_ROUND; _++) {
         std::cout << "第" << _ << "代:\n中位数: " << ga.get_mid() << "   平均数：" << ga.get_avg() << "\n种群中的个体值: "; 
         for(auto x : ga.Populations) {
@@ -191,5 +194,4 @@ int main () {
         std::cout << "\n\n";
         ga.iterate();
     }
-    int x = 1;
 }

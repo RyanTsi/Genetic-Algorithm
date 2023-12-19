@@ -11,12 +11,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
-            "args": [
-                // "<",
-                // "${workspaceRoot}/in.in",
-                ">",
-                "${workspaceRoot}/out.out"
-            ],
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
