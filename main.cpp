@@ -37,6 +37,7 @@ inline int get_rand(int x = 2147483647) {
 }
 inline double get_real_rand() { return get_rand() * 1.0 / INF; }
 
+// 5 位二进制 + 1 位符号
 struct one {
     int value;
     bool symbol; // 符号 0:-, 1:+
@@ -184,14 +185,15 @@ struct GA {
 
 int main () {
     std::cout << std::fixed << std::setprecision(6);
-    freopen("out.out", "w", stdout);
+    freopen("res", "w", stdout);
     GA ga(LIMIT, P_MUTATE);
     for(int _ = 0; _ <= GA_ROUND; _++) {
-        std::cout << "第" << _ << "代:\n中位数: " << ga.get_mid() << "   平均数：" << ga.get_avg() << "\n种群中的个体值: "; 
-        for(auto x : ga.Populations) {
-            std::cout << x.get_val() << " ";
-        }
-        std::cout << "\n\n";
+        std::cout <<  _ << " " << ga.get_avg() << "\n"; 
+        // std::cout << "第" << _ << "代:\n中位数: " << ga.get_mid() << "   平均数：" << ga.get_avg() << "\n种群中的个体值: "; 
+        // for(auto x : ga.Populations) {
+        //     std::cout << x.get_val() << " ";
+        // }
+        // std::cout << "\n\n";
         ga.iterate();
     }
 }
